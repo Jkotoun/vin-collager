@@ -1,88 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Image Mosaic</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <canvas id="combinedCanvas" width="800" height="600"></canvas>
-  <label for="imageRatio">Image Ratio:</label>
-  <input type="range" id="imageRatio" min="0" max="1" step="0.01" value="1">
-  <span id="ratioValue">1</span>
 
-  <label for="numRows">Number of Rows:</label>
-  <input type="range" id="numRows" min="1" max="100" step="1" value="50">
-  <span id="numRowsValue">50</span>
 
-  <label for="numCols">Number of Columns:</label>
-  <input type="range" id="numCols" min="1" max="100" step="1" value="50">
-  <span id="numColsValue">50</span>
+  <div class="sidebar">
+    <h1>Collager</h1>
+    <label for="image1">Upload Image 1:</label>
+    <input type="file" id="image1" accept="image/*">
 
-  <label>Randomize:</label>
-  <label for="randomizeYes">Yes</label>
-  <input type="radio" id="randomizeYes" name="randomize" value="yes" checked>
-  <label for="randomizeNo">No</label>
-  <input type="radio" id="randomizeNo" name="randomize" value="no">
+    <label for="image2">Upload Image 2:</label>
+    <input type="file" id="image2" accept="image/*">
+
+
+
+    <div id="settings">
+
+      <div class="radio-group">
+        <label>Mode:</label>
+        <div>
+          <input type="radio" id="triangles" name="mode" value="triangles">
+          <label for="triangles">Triangles</label>
+        </div>
+        <div>
+          <input type="radio" id="triangles-reversed" name="mode" value="triangles-reversed">
+          <label for="triangles-reversed">Triangles reversed</label>
+        </div>
+        <div>
+          <input type="radio" id="rectangles" name="mode" value="rectangles" checked>
+          <label for="rectangles">Rectangles</label>
+        </div>
+      </div>
+      </br>
+
+
+      <label for="numRows">Number of Rows: <span id="numRowsValue">20</span></label>
+      <input type="range" id="numRows" min="1" max="100" step="1" value="20">
+
+
+      <label for="numCols">Number of Columns: <span id="numColsValue">20</span></label>
+      <input type="range" id="numCols" min="1" max="100" step="1" value="20">
+
+
+
+
+      <div class="radio-group">
+        <label>Randomize:</label>
+        <div>
+          <input type="radio" id="randomizeYes" name="randomize" value="yes">
+          <label for="randomizeYes">Yes</label>
+        </div>
+        <div>
+          <input type="radio" id="randomizeNo" name="randomize" value="no" checked>
+          <label for="randomizeNo">No</label>
+        </div>
+      </div>
+      <br>
+      <div id="imgRatioSliderContainer">
+        <label for="imageRatio">Randomized Images Ratio: <span id="ratioValue">50% : 50%</span></label>
+        <input type="range" id="imageRatio" min="0" max="1" step="0.01" value="0.5">
+      </div>
+
+
+      <div class="radio-group">
+        <label>Swap Images:</label>
+        <div>
+          <input type="radio" id="swapYes" name="swap" value="yes">
+          <label for="swapYes">Yes</label>
+        </div>
+        <div>
+          <input type="radio" id="swapNo" name="swap" value="no" checked>
+          <label for="swapNo">No</label>
+        </div>
+      </div>
+      <br>
+      <a class="buttonBig" id="re-generate" href="#" download="mosaic.png"><i class="fa-solid fa-rotate-right"></i> Re-Generate</a>
+      <a class="buttonBig" id="canvasDownload" href="#" download="mosaic.png"><i class="fa-solid fa-download"></i> Download</a>
+    </div>
+  </div>
+  <div class="content">
+    <canvas id="combinedCanvas" width="1920" height="1080"></canvas>
+
+  </div>
+
 
   <script>
 
-  function getRandomElement(array) {
-    const randomIndex = Math.floor(Math.random() * array.length);
-    return array[randomIndex];
-  }
+    function getRandomElement(array) {
+      const randomIndex = Math.floor(Math.random() * array.length);
+      return array[randomIndex];
+    }
 
-  function createMosaic(images, numRows, numCols, ratio, randomized = false) {
-    const canvas = document.getElementById('combinedCanvas');
-    const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
+    function createMosaic(images, numRows, numCols, ratio, randomized = false, mode = 'rectangles', swap = false) {
+      const canvas = document.getElementById('combinedCanvas');
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
 
-    ctx.clearRect(0, 0, width, height);
+      ctx.clearRect(0, 0, width, height);
 
-    const blockWidth = width / numCols;
-    const blockHeight = height / numRows;
+      const blockWidth = width / numCols;
+      const blockHeight = height / numRows;
 
-    for (let row = 0; row < numRows; row++) {
-      for (let col = 0; col < numCols; col++) {
-        let img;
-        if (randomized) {
-          const probability = Math.random(); // Generate a random number between 0 and 1
-          img = probability <= ratio ? images[0] : images[1];
-        } else {
-          img = (row + col) % 2 === 0 ? images[0] : images[1];
+      for (let row = 0; row < numRows; row++) {
+        for (let col = 0; col < numCols; col++) {
+          let img;
+          if (randomized) {
+            const probability = Math.random();
+            img = probability <= ratio ? images[0] : images[1];
+            const probability2 = Math.random();
+            img2 = probability2 <= ratio ? images[0] : images[1];
+          } else {
+            img = (row + col) % 2 === 0 ? images[0] : images[1];
+            img2 = (row + col) % 2 === 0 ? images[1] : images[0];
+          }
+
+          const sourceX = col * (img.width / numCols);
+          const sourceY = row * (img.height / numRows);
+          const sourceWidth = img.width / numCols;
+          const sourceHeight = img.height / numRows;
+
+          const source2X = col * (img2.width / numCols);
+          const source2Y = row * (img2.height / numRows);
+          const source2Width = img2.width / numCols;
+          const source2Height = img2.height / numRows;
+
+          const destX = col * blockWidth;
+          const destY = row * blockHeight;
+          const destWidth = blockWidth;
+          const destHeight = blockHeight;
+
+          ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
+
+          if (mode === 'triangles') {
+            ctx.save()
+            ctx.beginPath();
+            ctx.moveTo(col * blockWidth, row * blockHeight);
+            ctx.lineTo((col + 1) * blockWidth, row * blockHeight);
+            ctx.lineTo(col * blockWidth, (row + 1) * blockHeight);
+            ctx.closePath();
+            ctx.clip();
+            ctx.drawImage(img2, source2X, source2Y, source2Width, source2Height, destX, destY, destWidth, destHeight);
+            ctx.restore();
+          }
+
+          if (mode === 'triangles-reversed') {
+            ctx.save()
+            ctx.beginPath();
+            ctx.moveTo(col * blockWidth, row * blockHeight);
+            ctx.lineTo((col + 1) * blockWidth, row * blockHeight);
+            ctx.lineTo((col + 1) * blockWidth, (row + 1) * blockHeight);
+            ctx.closePath();
+            ctx.clip();
+            ctx.drawImage(img2, source2X, source2Y, source2Width, source2Height, destX, destY, destWidth, destHeight);
+            ctx.restore();
+          }
+
         }
-
-        const sourceX = col * (img.width / numCols);
-        const sourceY = row * (img.height / numRows);
-        const sourceWidth = img.width / numCols;
-        const sourceHeight = img.height / numRows;
-
-        const destX = col * blockWidth;
-        const destY = row * blockHeight;
-        const destWidth = blockWidth;
-        const destHeight = blockHeight;
-
-        ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
       }
     }
-  }
 
-  const imagesPaths = [
-    'licenced.jpg',
-    'demobear.png',
-  ];
-  const images = imagesPaths.map(path => {
-    const img = new Image();
-    img.src = path;
-    return img;
-  });
+    const image1Input = document.getElementById('image1');
+    const image2Input = document.getElementById('image2');
 
-  Promise.all(images.map(img => new Promise(resolve => img.onload = resolve)))
-    .then(() => {
+    let image1Loaded = false;
+    let image2Loaded = false;
+    let images = []
+    const settingsElement = document.getElementById("settings");
+
+    image1Input.addEventListener('change', () => {
+      const file = image1Input.files[0];
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        img.src = e.target.result;
+        if (image1Loaded) {
+          images.shift();
+          images.unshift(img);
+          init();
+
+        }
+        else {
+          images.push(img);
+          image1Loaded = true;
+          if (image2Loaded) {
+            settingsElement.style.display = "block";
+            init();
+
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    image2Input.addEventListener('change', () => {
+      const file = image2Input.files[0];
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        img.src = e.target.result;
+        if (image2Loaded) {
+
+          images.pop();
+          images.push(img);
+          init();
+        }
+        else {
+          images.push(img);
+          image2Loaded = true;
+          if (image1Loaded) {
+            init();
+            settingsElement.style.display = "block";
+          }
+        }
+      };
+
+      reader.readAsDataURL(file);
+    });
+
+
+    function init() {
       const imageRatioInput = document.getElementById('imageRatio');
       const ratioValueSpan = document.getElementById('ratioValue');
 
+      const imageRatioSliderContainer = document.getElementById('imgRatioSliderContainer');
+      const regenerateButton = document.getElementById('re-generate');
       const numRowsInput = document.getElementById('numRows');
       const numRowsValueSpan = document.getElementById('numRowsValue');
 
@@ -92,9 +243,57 @@
       const randomizeYesInput = document.getElementById('randomizeYes');
       const randomizeNoInput = document.getElementById('randomizeNo');
 
+      const swapYesInput = document.getElementById('swapYes');
+      const swapNoInput = document.getElementById('swapNo');
+
+      const trianglesInput = document.getElementById('triangles');
+      const rectanglesInput = document.getElementById('rectangles');
+      const trianglesReversedInput = document.getElementById('triangles-reversed');
+
+      function updateMosaic() {
+        const ratio = parseFloat(imageRatioInput.value);
+        const numRows = parseInt(numRowsInput.value);
+        const numCols = parseInt(numColsInput.value);
+        const randomized = randomizeYesInput.checked;
+        const mode = trianglesInput.checked ? 'triangles' : (trianglesReversedInput.checked ? 'triangles-reversed' : 'rectangles');
+        const swap = swapYesInput.checked;
+        createMosaic(images, numRows, numCols, ratio, randomized, mode, swap);
+      }
+
+      trianglesInput.addEventListener('change', () => {
+        updateMosaic();
+      });
+
+      regenerateButton.addEventListener('click', () => {
+        updateMosaic();
+      });
+
+      rectanglesInput.addEventListener('change', () => {
+        updateMosaic();
+      });
+
+      swapNoInput.addEventListener('change', () => {
+        const temp = images[0];
+        images[0] = images[1];
+        images[1] = temp;
+        updateMosaic();
+
+      });
+
+      swapYesInput.addEventListener('change', () => {
+        const temp = images[0];
+        images[0] = images[1];
+        images[1] = temp;
+        updateMosaic();
+      });
+
+      trianglesReversedInput.addEventListener('change', () => {
+        updateMosaic();
+      });
+
       imageRatioInput.addEventListener('input', () => {
         const ratio = parseFloat(imageRatioInput.value);
-        ratioValueSpan.textContent = ratio.toFixed(2);
+        ratioValueSpan.textContent = (ratio*100).toFixed(0) + "% : " + ((1-ratio)*100).toFixed(0) + "%";
         updateMosaic();
       });
 
@@ -111,25 +310,42 @@
       });
 
       randomizeYesInput.addEventListener('change', () => {
+        if (randomizeYesInput.checked) {
+          imageRatioSliderContainer.style.display = 'block';
+
+        } else {
+          imageRatioSliderContainer.style.display = 'none';
+        }
         updateMosaic();
       });
 
       randomizeNoInput.addEventListener('change', () => {
+        if (randomizeYesInput.checked) {
+          imageRatioSliderContainer.style.display = 'block';
+        } else {
+          imageRatioSliderContainer.style.display = 'none';
+        }
         updateMosaic();
       });
 
-      function updateMosaic() {
-        const ratio = parseFloat(imageRatioInput.value);
-        const numRows = parseInt(numRowsInput.value);
-        const numCols = parseInt(numColsInput.value);
-        const randomized = randomizeYesInput.checked;
+      createMosaic(images, 20, 20, 0.5, false, 'rectangles', false);
 
-        createMosaic(images, numRows, numCols, ratio, randomized);
-      }
+      
+      const canvas = document.getElementById('combinedCanvas');
+      const canvasDownloadLink = document.getElementById('canvasDownload');
 
-      createMosaic(images, 50, 50, 1, true); // Initial mosaic with default values
-    });
+      canvasDownloadLink.addEventListener('click', () => {
+        const pngDataUrl = canvas.toDataURL('image/png');
+        canvasDownloadLink.href = pngDataUrl;
+
+      });
+      // canvasDownloadLink.href = pngDataUrl;
+    }
+
 
   </script>
+
+
 </body>
+
 </html>
