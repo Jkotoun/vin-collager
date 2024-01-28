@@ -97,8 +97,14 @@ function createMosaic(images, numRows, numCols, ratio, randomized = false, mode 
 
 
             if (['triangles', 'triangles-reversed'].includes(mode)) {
-                const probability2 = Math.random();
-                img2 = probability2 <= ratio ? images[0] : images[1];
+                let img2;
+                if (randomized){
+                    const probability = Math.random();
+                    img2 = probability <= ratio ? images[0] : images[1];
+                }
+                else{
+                    img2 = (row + col) % 2 === 0 ? images[1] : images[0];
+                }
                 //source image coordinates for second triangle
                 const source2X = col * (img2.width / numCols);
                 const source2Y = row * (img2.height / numRows);
