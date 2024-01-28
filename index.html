@@ -10,6 +10,21 @@
   <label for="imageRatio">Image Ratio:</label>
   <input type="range" id="imageRatio" min="0" max="1" step="0.01" value="1">
   <span id="ratioValue">1</span>
+
+  <label for="numRows">Number of Rows:</label>
+  <input type="range" id="numRows" min="1" max="100" step="1" value="50">
+  <span id="numRowsValue">50</span>
+
+  <label for="numCols">Number of Columns:</label>
+  <input type="range" id="numCols" min="1" max="100" step="1" value="50">
+  <span id="numColsValue">50</span>
+
+  <label>Randomize:</label>
+  <label for="randomizeYes">Yes</label>
+  <input type="radio" id="randomizeYes" name="randomize" value="yes" checked>
+  <label for="randomizeNo">No</label>
+  <input type="radio" id="randomizeNo" name="randomize" value="no">
+
   <script>
 
   function getRandomElement(array) {
@@ -25,8 +40,8 @@
 
     ctx.clearRect(0, 0, width, height);
 
-    const blockWidth = Math.floor(width / numCols);
-    const blockHeight = Math.floor(height / numRows);
+    const blockWidth = width / numCols;
+    const blockHeight = height / numRows;
 
     for (let row = 0; row < numRows; row++) {
       for (let col = 0; col < numCols; col++) {
@@ -35,7 +50,6 @@
           const probability = Math.random(); // Generate a random number between 0 and 1
           img = probability <= ratio ? images[0] : images[1];
         } else {
-
           img = (row + col) % 2 === 0 ? images[0] : images[1];
         }
 
@@ -69,14 +83,51 @@
       const imageRatioInput = document.getElementById('imageRatio');
       const ratioValueSpan = document.getElementById('ratioValue');
 
+      const numRowsInput = document.getElementById('numRows');
+      const numRowsValueSpan = document.getElementById('numRowsValue');
+
+      const numColsInput = document.getElementById('numCols');
+      const numColsValueSpan = document.getElementById('numColsValue');
+
+      const randomizeYesInput = document.getElementById('randomizeYes');
+      const randomizeNoInput = document.getElementById('randomizeNo');
+
       imageRatioInput.addEventListener('input', () => {
         const ratio = parseFloat(imageRatioInput.value);
         ratioValueSpan.textContent = ratio.toFixed(2);
-        console.log
-        createMosaic(images, 50, 50, ratio, true); // Adjust the number of rows and columns as needed
+        updateMosaic();
       });
 
-      // createMosaic(images, 50, 50, ratio, true); // Initial mosaic with default ratio
+      numRowsInput.addEventListener('input', () => {
+        const numRows = parseInt(numRowsInput.value);
+        numRowsValueSpan.textContent = numRows;
+        updateMosaic();
+      });
+
+      numColsInput.addEventListener('input', () => {
+        const numCols = parseInt(numColsInput.value);
+        numColsValueSpan.textContent = numCols;
+        updateMosaic();
+      });
+
+      randomizeYesInput.addEventListener('change', () => {
+        updateMosaic();
+      });
+
+      randomizeNoInput.addEventListener('change', () => {
+        updateMosaic();
+      });
+
+      function updateMosaic() {
+        const ratio = parseFloat(imageRatioInput.value);
+        const numRows = parseInt(numRowsInput.value);
+        const numCols = parseInt(numColsInput.value);
+        const randomized = randomizeYesInput.checked;
+
+        createMosaic(images, numRows, numCols, ratio, randomized);
+      }
+
+      createMosaic(images, 50, 50, 1, true); // Initial mosaic with default values
     });
 
   </script>
